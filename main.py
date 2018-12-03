@@ -51,7 +51,7 @@ Builder.load_string('''
         Screen:
             id: sc2
             name: 'gallery'
-            FileChooserListView:
+            FileChooserIconView:
                 id: file_chooser
                 canvas.before:
                     Color: 
@@ -88,6 +88,12 @@ class CameraClick(TabbedPanel):
         self.current_tab.state = "normal"
         header.state = "down"
         self._current_tab = header
+        print(self._current_tab.screen)
+        if self._current_tab.screen == 'Camera':
+            self.ids.camera.play = True
+            Clock.schedule_once(self.scheduled_scan, 1)
+        else:
+            self.ids.camera.play = False
         self.ids.file_chooser.path = App.get_running_app().user_data_dir
     def capture(self):
         camera = self.ids['camera']
@@ -181,7 +187,6 @@ class CameraClick(TabbedPanel):
             label.text = str(symbol.type) + '\n\n' + str(symbol.data)
             self.switch_to(self.ids.sc3head)
             # self.ids.camera.play = False
-            Clock.schedule_once(self.scheduled_scan, 1)
             break
         else:
             os.remove(app_folder+"/IMG_{}.jpg".format(timestr))
