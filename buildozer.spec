@@ -1,13 +1,13 @@
 [app]
 
 # (str) Title of your application
-title = My Application
+title = SQR Reader
 
 # (str) Package name
-package.name = myapp
+package.name = sqr
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = org.test
+package.domain = io.github.sqr
 
 # (str) Source code where the main.py live
 source.dir = .
