@@ -30,14 +30,14 @@ Builder.load_string('''
                     id: camera
                     resolution: (640, 480)
                     play: True
-                
+
         Screen:
             id: sc2
             name: 'gallery'
             FileChooserIconView:
                 id: file_chooser
                 canvas.before:
-                    Color: 
+                    Color:
                         rgb: 04,0.5,0.4
                     Rectangle:
                         pos: self.pos
@@ -49,7 +49,7 @@ Builder.load_string('''
             Label:
                 id: result
                 text: "Nothing"
-        
+
     TabbedPanelHeader:
         text: sc1.name
         screen: sc1.name
@@ -109,24 +109,49 @@ class CameraClick(TabbedPanel):
         scanner.parse_config('enable')
         timestr = time.strftime("%Y%m%d_%H%M%S")
         # app_folder = os.path.dirname(os.path.abspath(__file__))
-        # print(app_folder)
         tc = App.get_running_app()
         app_folder = tc.user_data_dir
         if not os.path.exists(app_folder):
             os.makedirs(app_folder)
         camera.export_to_png(app_folder+"/IMG_{}.jpg".format(timestr))
+        px = None
+        try:
+            px = camera.texture.pixels
+        except Exception as e:
+            print(e)
         pil = Image.open(app_folder+"/IMG_{}.jpg".format(timestr)).convert('L')
         width, height = pil.size
+        print(type(px), '=========================')
         try:
             raw = pil.tostring()
+            # if px is not None:
+                # tex_image = Image.from_string(px)
+                # print(tex_image, '------------------------------------------------------------')
         except(AttributeError, NotImplementedError):
-            raw = pil.tobytes()
+            # raw = pil.tobytes()
+            # import io
+            # tempbuff = StringIO.StringIO()
+            # tempbuff.write(px)
+            # tempbuff.seek(0)
+            if px is not None:
+                text_i = Image.frombytes('RGBA', camera.texture.size, px, 'raw').convert('L')
+                # print(text_i)
+                # text_i.save(app_folder+'/out'+timestr+'.png')
+                raw = text_i.tobytes()
+                print("getting from raw, does it work?")
+            else: raw = pil.tobytes()
+            # if px is not None:
+                # tex_image = Image.from_bytes(px)
+                # print(tex_image, '------------------------------------------------------------')
         image = zbar.Image(width, height, 'Y800', raw)
 
         scanner.scan(image)
 
         for symbol in image:
             print 'decoded', symbol.type, symbol.data
+            os.rename(app_folder+"/IMG_{}.jpg".format(timestr),
+                      app_folder+"/d_{}_{}.jpg".format(symbol.data, timestr))
+            print(app_folder, os.listdir(app_folder))
             label = self.ids.result
             label.text = str(symbol.type) + '\n\n' + str(symbol.data)
             self.switch_to(self.ids.sc3head)
