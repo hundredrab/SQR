@@ -1,16 +1,20 @@
-from PIL import Image
-from kivy.uix.label import Label
-import zbar
 import os
 import time
-from kivy.clock import Clock
-from kivy.uix.tabbedpanel import TabbedPanel
-from kivy.properties import ObjectProperty
-from kivy.uix.scatterlayout import ScatterLayout
-from kivy.uix.boxlayout import BoxLayout
-from kivy.lang import Builder
-from kivy.app import App
+
+from PIL import Image
+
 import kivy
+import zbar
+from kivy.app import App
+from kivy.clock import Clock
+from kivy.lang import Builder
+from kivy.properties import ObjectProperty
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.scatterlayout import ScatterLayout
+from kivy.uix.tabbedpanel import TabbedPanel
+import pyqrcode
+
 kivy.require('1.10.0')
 # import cv2
 # import android
@@ -30,14 +34,14 @@ Builder.load_string('''
                     id: camera
                     resolution: (640, 480)
                     play: True
-                
+
         Screen:
             id: sc2
             name: 'gallery'
             FileChooserIconView:
                 id: file_chooser
                 canvas.before:
-                    Color: 
+                    Color:
                         rgb: 04,0.5,0.4
                     Rectangle:
                         pos: self.pos
@@ -49,7 +53,20 @@ Builder.load_string('''
             Label:
                 id: result
                 text: "Nothing"
-        
+
+        Screen:
+            id: sc4
+            name: 'Create New'
+            BoxLayout:
+                orientation: 'vertical'
+                TextInput:
+                    name: 'txt'
+                    id: txt
+                    text: 'SQRReader'
+                Button:
+                    text: 'Create'
+                    on_press: root.say_my_name(txt.text)
+
     TabbedPanelHeader:
         text: sc1.name
         screen: sc1.name
@@ -60,6 +77,10 @@ Builder.load_string('''
         id: sc3head
         text: sc3.name
         screen: sc3.name
+    TabbedPanelHeader:
+        id: sc4head
+        text: sc4.name
+        screen: sc4.name
 ''')
 
 
@@ -137,6 +158,15 @@ class CameraClick(TabbedPanel):
             print("Found nothing.")
             Clock.schedule_once(self.scheduled_scan, 1.0/2)
         del(image)
+
+    def say_my_name(self, text):
+        # print(self.ids.txt)
+        # print(dir(self.ids.txt))
+        print(text)
+        qr_code_raw = pyqrcode.create(text)
+        app_folder = App.get_running_app().user_data_dir
+        qr_code_raw.svg('SQR'+text+'.svg', scale=8)
+        print("saved!")
 
 
 class SQRReader(App):
