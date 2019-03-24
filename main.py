@@ -4,6 +4,7 @@ import time
 from PIL import Image
 
 import kivy
+import pyqrcode
 import zbar
 from kivy.app import App
 from kivy.clock import Clock
@@ -13,7 +14,6 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.scatterlayout import ScatterLayout
 from kivy.uix.tabbedpanel import TabbedPanel
-import pyqrcode
 
 kivy.require('1.10.0')
 # import cv2
